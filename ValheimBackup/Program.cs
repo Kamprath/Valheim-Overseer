@@ -7,8 +7,10 @@ namespace ValheimBackup
     class Program
     {
         private const string ServerName = "Test Server";
-        private const int Port = 2456;
+        private const string World = "Dedicated";
         private const string Password = "secret";
+        private const int Port = 2456;
+        private const string SteamAppId = "892970";
         
         static void Main(string[] args)
         {
@@ -31,8 +33,8 @@ namespace ValheimBackup
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.FileName = filePath;
-                process.StartInfo.Arguments = $"-nographics -batchmode -name \"{ServerName}\" -port {Port} -world \"Dedicated\" -password \"{Password}\"";
-                process.StartInfo.Environment.Add("SteamAppId", "892970");
+                process.StartInfo.Arguments = $"-nographics -batchmode -name \"{ServerName}\" -port {Port} -world \"{World}\" -password \"{Password}\"";
+                process.StartInfo.Environment.Add("SteamAppId", SteamAppId);
 
                 process.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
                 process.ErrorDataReceived += (sender, e) => Console.WriteLine($"ERROR: {e.Data}");
