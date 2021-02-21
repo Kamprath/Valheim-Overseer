@@ -28,6 +28,7 @@ namespace ValheimBackup
                     
                 process.CloseMainWindow();
                 process.WaitForExit();
+                process.Close();
             };
             
             ConfigureStartInfo(process.StartInfo);
