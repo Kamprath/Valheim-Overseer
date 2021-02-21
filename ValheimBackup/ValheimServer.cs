@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace ValheimBackup
 {
@@ -7,9 +9,13 @@ namespace ValheimBackup
     {
         public string FilePath { get; set; }
         
-        private string PendingPlayerId { get; set; }
+        private string ConnectingPlayerId { get; set; }
+
+        private readonly Dictionary<string, string> _players = new Dictionary<string, string>();
 
         private Config Config { get; } = new Config();
+
+        private Dictionary<string, string> Players => _players;
 
         public void Start()
         {
@@ -61,12 +67,12 @@ namespace ValheimBackup
             
             // todo: make these calls async
             if (output.Contains("Game server connected")) return OnWorldReady(output);
+            if (output.Contains("Got handshake from client ")) return OnPlayerConnecting(output);
             if (output.Contains(": Got character ZDOID from ")) return OnPlayerConnected(output);
             if (output.Contains(": Closing socket ")) return OnPlayerDisconnect(output);
             if (output.Contains(":  Connections ")) return OnConnectionCount(output);
             if (output.Contains("World saved (")) return OnWorldSave();
             
-            Console.WriteLine($"Debug: {output}");
             return true;
         }
         
@@ -78,17 +84,31 @@ namespace ValheimBackup
 
         private bool OnPlayerConnecting(string output)
         {
-            // parse ID from string and store in PendingPlayerId
+            var searchStr = "Got handshake from client ";
+            
+            ConnectingPlayerId = output.Substring(
+                output.IndexOf(searchStr, StringComparison.Ordinal) + searchStr.Length
+            ).Trim();
+
             return true;
         }
         
         private bool OnPlayerConnected(string output)
         {
             var startStr = "Got character ZDOID from ";
-            var startPos = output.IndexOf(startStr, StringComparison.Ordinal) + startStr.Length;
 
-            var tempString = output.Substring(startPos);
-            var playerName = tempString.Substring(0, tempString.IndexOf(" : ", StringComparison.Ordinal));
+            var tempString = output.Substring(
+                output.IndexOf(startStr, StringComparison.Ordinal) + startStr.Length
+            );
+            var playerName = tempString.Substring(
+                0, 
+                tempString.IndexOf(" : ", StringComparison.Ordinal)
+            );
+
+            if (Players.ContainsValue(playerName)) return false;
+            
+            Players.Add(ConnectingPlayerId, playerName);
+            ConnectingPlayerId = null;
 
             ConsoleWrite($"Player {playerName} connected");
             return true;
@@ -102,9 +122,24 @@ namespace ValheimBackup
             ).Trim();
 
             if (playerId == "0") return false;
-            
-            ConsoleWrite($"Player disconnected ({playerId})");
-            
+
+            // if connecting player disconnects, reset the ID
+            if (playerId == ConnectingPlayerId)
+            {
+                ConnectingPlayerId = null;
+                return false;
+            }
+
+            if (!Players.ContainsKey(playerId))
+            {
+                ConsoleWrite($"Unknown player disconnected ({playerId})");
+                return false;
+            }
+
+            ConsoleWrite($"Player {Players[playerId]} disconnected");
+
+            Players.Remove(playerId);
+
             return true;
         }
 
@@ -116,7 +151,7 @@ namespace ValheimBackup
         private bool OnWorldSave()
         {
             // todo: create world backup
-            ConsoleWrite("World saved.");
+            ConsoleWrite("World saved");
             return true;
         }
         
@@ -125,6 +160,5 @@ namespace ValheimBackup
             var now = DateTime.Now;
             Console.WriteLine($"[{now.Month}/{now.Day}/{now.Year} {now.Hour}:{now.Minute}:{now.Second}]  {message}");
         }
-        
     }
 }
