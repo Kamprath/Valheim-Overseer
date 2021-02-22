@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.IO;
+using System.Text.Json;
 
 namespace ValheimBackup
 {
@@ -13,7 +14,7 @@ namespace ValheimBackup
 
         private readonly Dictionary<string, string> _players = new Dictionary<string, string>();
 
-        private Config Config { get; } = new Config();
+        private Config Config { get; } = GetConfig();
 
         private Dictionary<string, string> Players => _players;
 
@@ -34,7 +35,6 @@ namespace ValheimBackup
                     
                 process.CloseMainWindow();
                 process.WaitForExit();
-                process.Close();
             };
             
             ConfigureStartInfo(process.StartInfo);
@@ -151,11 +151,39 @@ namespace ValheimBackup
         private bool OnWorldSave()
         {
             // todo: create world backup
+            SaveBackup();
+
             ConsoleWrite("World saved");
             return true;
         }
+
+        private void SaveBackup()
+        {
+            // open filestream to world files
+            // copy to backup folder
+            // close filestream
+        }
+
+        private static Config GetConfig()
+        {
+            if (!File.Exists("config.json"))
+            {
+                ConsoleWrite("ERROR: No config.json file found. Using default configuration.");
+                return new Config
+                {
+                    ServerName = "New Valheim Server",
+                    Password = "secret",
+                    Port = 2456,
+                    SteamAppId = 892970
+                };
+            }
+
+            return JsonSerializer.Deserialize<Config>(
+                File.ReadAllText("config.json")
+            );
+        }
         
-        private void ConsoleWrite(string message)
+        private static void ConsoleWrite(string message)
         {
             var now = DateTime.Now;
             Console.WriteLine($"[{now.Month}/{now.Day}/{now.Year} {now.Hour}:{now.Minute}:{now.Second}]  {message}");

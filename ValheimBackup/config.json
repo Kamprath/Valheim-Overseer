@@ -1,0 +1,7 @@
+{
+  "ServerName": "New Valheim Server",
+  "Password": "secret",
+  "World": "Dedicated",
+  "Port": 2456,
+  "SteamAppId": 892970
+}

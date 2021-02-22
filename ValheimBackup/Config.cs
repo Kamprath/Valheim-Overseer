@@ -2,14 +2,14 @@ namespace ValheimBackup
 {
     public class Config
     {
-        public string ServerName = "test";
+        public string ServerName { get; set; }
         
-        public string World = "Dedicated";
+        public string World { get; set; }
 
-        public string Password = "secret";
+        public string Password { get; set; }
 
-        public int Port = 2456;
+        public int Port { get; set; }
 
-        public int SteamAppId = 892970;
+        public int SteamAppId { get; set; }
     }
 }
