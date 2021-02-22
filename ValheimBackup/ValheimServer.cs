@@ -169,13 +169,7 @@ namespace ValheimBackup
             if (!File.Exists("config.json"))
             {
                 ConsoleWrite("ERROR: No config.json file found. Using default configuration.");
-                return new Config
-                {
-                    ServerName = "New Valheim Server",
-                    Password = "secret",
-                    Port = 2456,
-                    SteamAppId = 892970
-                };
+                return Config.GetDefault();
             }
 
             return JsonSerializer.Deserialize<Config>(

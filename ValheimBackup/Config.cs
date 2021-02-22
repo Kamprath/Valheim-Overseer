@@ -11,5 +11,16 @@ namespace ValheimBackup
         public int Port { get; set; }
 
         public int SteamAppId { get; set; }
+
+        public static Config GetDefault()
+        {
+            return new Config
+            {
+                ServerName = "New Valheim Server",
+                Password = "secret",
+                Port = 2456,
+                SteamAppId = 892970
+            };
+        }
     }
 }
