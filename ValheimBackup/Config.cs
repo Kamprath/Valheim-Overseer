@@ -22,7 +22,7 @@ namespace ValheimBackup
                 Password = "secret",
                 Port = 2456,
                 SteamAppId = 892970,
-                MaxWorldBackups = 72
+                MaxWorldBackups = 60
             };
         }
     }
