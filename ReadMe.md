@@ -18,7 +18,7 @@ Logging and backup settings are configured via `config.json`.
 ## Install
 
 1. Download the latest release for your platform
-2. Copy files from `Valheim_Overseer.zip` to your Valheim server directory (click here for instructions on locating it)
+2. Copy files from `Valheim_Overseer.zip` to your Valheim server directory ([click here](https://steamcommunity.com/sharedfiles/filedetails/?id=760447682) for instructions on locating it)
 3. Configure your server settings via `config.json`:
    - `ServerName` - Server name that will appear in server browser
    - `World` - Name of world file. Defaults to `"Dedicated"`.
