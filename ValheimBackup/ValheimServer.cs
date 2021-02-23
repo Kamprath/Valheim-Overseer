@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.Json;
 
 namespace ValheimBackup
@@ -21,7 +22,17 @@ namespace ValheimBackup
 
         public void Start()
         {
-            ConsoleWrite("Starting Valheim server...");
+            var ip = GetPublicIp();
+
+            if (ip != null)
+            {
+                ConsoleWrite($"Starting Valheim server at {ip}:{Config.Port}");
+            }
+            else
+            {
+                ConsoleWrite($"Starting Valheim server on port {Config.Port}");
+            }
+            
             RunExecutable();
         }
 
@@ -228,6 +239,19 @@ namespace ValheimBackup
                 }
                 
                 backupDirs = backupDirs.Where(x => x != dirToDelete).ToList();
+            }
+        }
+
+        private static string GetPublicIp()
+        {
+            try
+            {
+                return new WebClient().DownloadString("http://icanhazip.com").Trim();
+            }
+            catch (Exception e)
+            {
+                ConsoleWrite("ERROR: Could not determine public IP address");
+                return null;
             }
         }
 
