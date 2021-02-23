@@ -252,7 +252,7 @@ namespace ValheimBackup
 
         private static string PrependZero(int number)
         {
-            return number < 9 ? $"0{number}" : number.ToString();
+            return number < 10 ? $"0{number}" : number.ToString();
         }
     }
 }
