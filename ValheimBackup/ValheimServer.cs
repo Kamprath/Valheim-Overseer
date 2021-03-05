@@ -76,14 +76,21 @@ namespace ValheimBackup
             
             if (output.Contains("(Filename: ")) return false;
             if (output.Trim() == "") return false;
-            
-            // todo: make these calls async
-            if (output.Contains("Game server connected")) return OnServerReady(output);
-            if (output.Contains("Got handshake from client ")) return OnPlayerConnecting(output);
-            if (output.Contains(": Got character ZDOID from ")) return OnPlayerConnected(output);
-            if (output.Contains(": Closing socket ")) return OnPlayerDisconnect(output);
-            if (output.Contains(":  Connections ")) return OnConnectionCount(output);
-            if (output.Contains("World saved (")) return OnWorldSave();
+
+            try
+            {
+                if (output.Contains("Game server connected")) return OnServerReady(output);
+                if (output.Contains("Got handshake from client ")) return OnPlayerConnecting(output);
+                if (output.Contains(": Got character ZDOID from ")) return OnPlayerConnected(output);
+                if (output.Contains(": Closing socket ")) return OnPlayerDisconnect(output);
+                if (output.Contains(":  Connections ")) return OnConnectionCount(output);
+                if (output.Contains("World saved (")) return OnWorldSave();
+            }
+            catch (Exception e)
+            {
+                ConsoleWrite($"ERROR: Failed to handle event string \"output\"\nException:\n{e.Message}");
+                return false;
+            }
             
             return true;
         }
@@ -107,6 +114,8 @@ namespace ValheimBackup
         
         private bool OnPlayerConnected(string output)
         {
+            if (ConnectingPlayerId == null) return false;
+
             var startStr = "Got character ZDOID from ";
 
             var tempString = output.Substring(
@@ -157,6 +166,7 @@ namespace ValheimBackup
 
         private bool OnConnectionCount(string output)
         {
+            // todo: Write "2 connected players: PlayerNameHere, AnotherOneHere 
             return true;
         }
 
